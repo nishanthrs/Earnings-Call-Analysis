@@ -68,9 +68,6 @@ def analyze_transcript(transcript_doc, transcript_text, k):
     noun_freq = Counter(nouns)
     common_nouns = noun_freq.most_common(k)
 
-    print("Common words: ", common_words)
-    print("Common nouns: ", common_nouns)
-
     return (common_words, common_nouns)
 
 
