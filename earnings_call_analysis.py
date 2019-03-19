@@ -7,9 +7,18 @@ from collections import Counter
 
 # nltk.download('stopwords')
 nlp = spacy.load('en')
+# TODO: Continue to remove more stopwords (i.e. company name, %, etc.)
+new_stopwords = ['thank', '’s',
+                 '%']  # People say 'thank you' way too much in earnings calls!
 
 
-def tokenize_and_clean_transcript(local_file):
+def add_stopwords(stopwords, new_stopwords):
+    for new_stopword in new_stopwords:
+        stopwords.add(new_stopword)
+    return stopwords
+
+
+def tokenize_and_clean_transcript(local_file, new_stopwords):
     '''
     Method that implements NLP pipeline of cleaning text:
     1. Tokenization
@@ -23,6 +32,7 @@ def tokenize_and_clean_transcript(local_file):
 
     punctuation = string.punctuation
     stopwords = spacy.lang.en.stop_words.STOP_WORDS
+    stopwords = add_stopwords(stopwords, new_stopwords)
 
     transcript_read = open(local_file, 'r')
     transcript_doc = nlp(transcript_read.read())
@@ -36,7 +46,7 @@ def tokenize_and_clean_transcript(local_file):
         tok for tok in transcript_text
         if tok not in stopwords and tok not in punctuation
     ]
-    print(transcript_text)
+
     return (transcript_doc, transcript_text)
 
 
@@ -61,7 +71,21 @@ def analyze_transcript(transcript_doc, transcript_text, k):
     print("Common words: ", common_words)
     print("Common nouns: ", common_nouns)
 
+    return (common_words, common_nouns)
+
+
+def write_freq_words_to_file(local_file, common_terms):
+    freq_words_file = open(local_file, 'w+')
+
+    for terms in common_terms:
+        for term in terms:
+            freq_words_file.write(str(term) + ' ')
+        freq_words_file.write('\n')
+
+    freq_words_file.close()
+
 
 crm_transcript_doc, crm_transcript_text = tokenize_and_clean_transcript(
-    'crm_earnings_transcript_clean_2.txt')
-analyze_transcript(crm_transcript_doc, crm_transcript_text, 10)
+    'crm_earnings_transcript_clean_2.txt', new_stopwords)
+common_terms = analyze_transcript(crm_transcript_doc, crm_transcript_text, 10)
+write_freq_words_to_file('crm_earnings_transcript_freq_words.txt', common_terms)
