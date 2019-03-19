@@ -6,7 +6,10 @@ import spacy
 # nltk.download('stopwords')
 # stopwords = spacy.lang.en.stop_words.STOP_WORDS
 nlp = spacy.load('en')
-punct_marks = ['.', ',', '?', '!', '*', '-', '\n', '\n\n']
+punct_marks = [
+    '.', ',', '?', '!', '*', '-', '\n', '\n\n', '\'s', 'n\'t', '\'re', '\'ve',
+    '\'ll'
+]
 
 
 def add_punct_stopwords(punct_marks):
@@ -21,12 +24,12 @@ def clean_earnings_call_transcript(local_file):
     # 1. Tokenize
     transcript_text = nlp(transcript_read.read())
     # 2. Remove stopwords
+    # 3. Lemmatization
     add_punct_stopwords(punct_marks)
     transcript_text = [
-        token.text for token in transcript_text if not token.is_stop
+        token.lemma_ for token in transcript_text if not token.is_stop
     ]
     print(transcript_text)
-    # 3. Lemmatization
 
 
 clean_earnings_call_transcript('crm_earnings_transcript_clean_2.txt')
