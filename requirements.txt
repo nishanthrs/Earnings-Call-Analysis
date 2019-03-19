@@ -1,0 +1,8 @@
+nltk
+spacy
+string
+collections
+requests
+html2text
+random
+regex
