@@ -4,6 +4,7 @@ import nltk
 import spacy
 import string
 from collections import Counter
+import os
 
 # nltk.download('stopwords')
 nlp = spacy.load('en')
@@ -71,8 +72,11 @@ def analyze_transcript(transcript_doc, transcript_text, k):
     return (common_words, common_nouns)
 
 
-def write_freq_words_to_file(local_file, common_terms):
-    freq_words_file = open(local_file, 'w+')
+def write_freq_words_to_file(analysis_dir, local_file, common_terms):
+    if not os.path.exists(analysis_dir):
+        os.makedirs(analysis_dir)
+    freq_words_file_path = analysis_dir + '/' + local_file
+    freq_words_file = open(freq_words_file_path, 'w+')
 
     for terms in common_terms:
         for term in terms:
@@ -82,7 +86,17 @@ def write_freq_words_to_file(local_file, common_terms):
     freq_words_file.close()
 
 
-crm_transcript_doc, crm_transcript_text = tokenize_and_clean_transcript(
-    'crm_earnings_transcript_clean_2.txt', new_stopwords)
-common_terms = analyze_transcript(crm_transcript_doc, crm_transcript_text, 10)
-write_freq_words_to_file('crm_earnings_transcript_freq_words.txt', common_terms)
+def exec_transcript_analysis(transcript_dir, analysis_dir, transcript_filename):
+    transcript_path = transcript_dir + transcript_filename
+    transcript_doc, transcript_text = tokenize_and_clean_transcript(
+        transcript_path, new_stopwords)
+    common_terms = analyze_transcript(transcript_doc, transcript_text, 10)
+    write_freq_words_to_file(
+        analysis_dir,
+        transcript_filename.split('.')[0] + '_freq_words.txt', common_terms)
+
+
+transcript_dir = '../earnings_call_transcripts/tndm/'
+analysis_dir = '../nlp_analyis'
+transcript_filename = 'tndm_earnings_transcript_q3_2018.txt'
+exec_transcript_analysis(transcript_dir, analysis_dir, transcript_filename)

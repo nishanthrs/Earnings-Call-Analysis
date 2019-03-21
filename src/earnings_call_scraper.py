@@ -2,10 +2,15 @@ import requests
 import html2text
 import random
 import re
+import os
 '''
 # References: 
 #   1. Scraping Seeking Alpha pages: https://stackoverflow.com/questions/48756326/web-scraping-results-in-403-forbidden-error
-#   2. Free proxies: https://free-proxy-list.net
+#   2. Free proxies: https://free-proxy-list.net]
+
+# Look into additional storage options: local filesystems, cloud filesystems, SQL or NoSQL databases
+# For now, since the files aren't too large, we'll use a 
+# Requirements of storage option: store large number of small files, quick access/lookup time (read operation)
 '''
 
 
@@ -17,7 +22,19 @@ def get_rand_ip_address():
     return random.choice(free_proxies)
 
 
-def get_earnings_call_transcript(transcript_uri):
+def create_filename(transcript_uri):
+    transcript_metadata = transcript_uri.split('-')
+    stock_symbol_idx = transcript_metadata.index('ceo') - 1
+    stock_symbol = transcript_metadata[stock_symbol_idx]
+    date = [q for q in transcript_metadata if re.match(r'\b(q[1-4])\b', q)][0]
+    year = [q for q in transcript_metadata if re.match(r'\b(\d{4})\b', q)][0]
+
+    transcript_filename = stock_symbol + '_earnings_transcript_' + date + '_' + year + '.txt'
+
+    return transcript_filename
+
+
+def get_earnings_call_transcript(transcript_uri, transcript_filename):
     successful_req = False
     while not successful_req:
         try:
@@ -39,28 +56,54 @@ def get_earnings_call_transcript(transcript_uri):
             print("Someone closed the program")
             break
 
-    crm = open('crm_earnings_transcript_2.txt', 'w+')
-    crm.write(r)
-    crm.close()
+    transcript = open(transcript_filename, 'w+')
+    transcript.write(r)
+    transcript.close()
 
 
-def clean_earnings_call_transcript_html(local_file):
-    crm_read = open(local_file, 'r')
-    cleaned_earnings_transcript = html2text.html2text(crm_read.read())
-    crm_read.close()
-    crm_clean = open('crm_earnings_transcript_clean_2.txt', 'w+')
+def clean_earnings_call_transcript_html(local_file, clean_file):
+    transcript_read = open(local_file, 'r')
+    cleaned_earnings_transcript = html2text.html2text(transcript_read.read())
+    transcript_read.close()
+    os.remove(local_file)
 
-    a = re.search(r'\b(Company Participants)\b',
-                  cleaned_earnings_transcript).start()
+    print(cleaned_earnings_transcript)
+
+    stock_symbol = clean_file.split('_')[0]
+    stock_dir = '../earnings_call_transcripts/' + stock_symbol
+    if not os.path.exists(stock_dir):
+        stock_dir = '../earnings_call_transcripts/' + stock_symbol
+        os.makedirs(stock_dir)
+    transcript_path = stock_dir + '/' + clean_file
+    transcript_clean = open(transcript_path, 'w+')
+
+    a_1 = re.search(r'\b(Company Participants)\b', cleaned_earnings_transcript)
+    a_2 = re.search(r'\b(Executives)\b', cleaned_earnings_transcript)
+    if a_1 == None:
+        a = a_2.start()
+    else:
+        a = a_1.start()
     b = re.search(r'\b(Follow SA Transcripts and get email alerts)\b',
                   cleaned_earnings_transcript).start()
 
-    crm_clean.write(cleaned_earnings_transcript[(a - 2):b])
-    crm_clean.close()
+    transcript_clean.write(cleaned_earnings_transcript[(a - 2):b])
+    transcript_clean.close()
 
 
-get_earnings_call_transcript(
-    'https://seekingalpha.com/article/4246320-salesforce-com-inc-crm-ceo-marc-benioff-q4-2019-results-earnings-call-transcript'
+def scrape_clean_transcript(transcript_uri):
+    get_earnings_call_transcript(
+        transcript_uri, '../earnings_call_transcripts/transcript_html.txt')
+
+    transcript_filename = create_filename(transcript_uri)
+    clean_earnings_call_transcript_html(
+        '../earnings_call_transcripts/transcript_html.txt', transcript_filename)
+
+
+'''
+scrape_clean_transcript(
+    'https://seekingalpha.com/article/4244554-tandem-diabetes-care-inc-tndm-ceo-kim-blickenstaff-q4-2018-results-earnings-call-transcript?part=single'
 )
-
-clean_earnings_call_transcript_html('crm_earnings_transcript_2.txt')
+'''
+scrape_clean_transcript(
+    'https://seekingalpha.com/article/4217453-tandem-diabetes-care-inc-tndm-ceo-kim-blickenstaff-q3-2018-results-earnings-call-transcript'
+)
