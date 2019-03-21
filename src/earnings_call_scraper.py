@@ -99,11 +99,9 @@ def scrape_clean_transcript(transcript_uri):
         '../earnings_call_transcripts/transcript_html.txt', transcript_filename)
 
 
-'''
 scrape_clean_transcript(
     'https://seekingalpha.com/article/4244554-tandem-diabetes-care-inc-tndm-ceo-kim-blickenstaff-q4-2018-results-earnings-call-transcript?part=single'
 )
-'''
 scrape_clean_transcript(
     'https://seekingalpha.com/article/4217453-tandem-diabetes-care-inc-tndm-ceo-kim-blickenstaff-q3-2018-results-earnings-call-transcript'
 )
