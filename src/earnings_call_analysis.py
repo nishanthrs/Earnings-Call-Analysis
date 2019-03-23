@@ -8,7 +8,7 @@ import os
 
 # nltk.download('stopwords')
 nlp = spacy.load('en')
-# TODO: Continue to remove more stopwords (i.e. company name, %, etc.)
+# TODO: Continue to remove more stopwords (i.e. company name, 'quarter', 'year', '%', etc.)
 new_stopwords = ['thank', '’s',
                  '%']  # People say 'thank you' way too much in earnings calls!
 
