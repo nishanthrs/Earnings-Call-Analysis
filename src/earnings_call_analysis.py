@@ -9,11 +9,21 @@ import os
 # nltk.download('stopwords')
 nlp = spacy.load('en')
 # TODO: Continue to remove more stopwords (i.e. company name, 'quarter', 'year', '%', etc.)
-new_stopwords = ['thank', '’s',
+new_stopwords = ['thank', 'quarter', 'year', '’s',
                  '%']  # People say 'thank you' way too much in earnings calls!
 
 
 def add_stopwords(stopwords, new_stopwords):
+    """
+    Method that adds new stopwords to list of spacy default stopwords
+
+    Args:
+    stopwords - spacy default stopwords
+    new_stopwords - new stopwords
+
+    Returns: new list of stopwords
+    """
+
     for new_stopword in new_stopwords:
         stopwords.add(new_stopword)
     return stopwords
@@ -53,7 +63,7 @@ def tokenize_and_clean_transcript(local_file, new_stopwords):
     return (transcript_doc, transcript_text)
 
 
-def analyze_transcript(transcript_doc, transcript_text, k):
+def get_freq_terms(transcript_doc, transcript_text, k):
     """
     Method that get k most frequent words of earnings call transcript
 
@@ -74,7 +84,12 @@ def analyze_transcript(transcript_doc, transcript_text, k):
     noun_freq = Counter(nouns)
     common_nouns = noun_freq.most_common(k)
 
-    return (common_words, common_nouns)
+    # five most common verb tokens
+    verbs = [token.lemma_ for token in transcript_doc if token.pos_ == 'VERB']
+    verb_freq = Counter(verbs)
+    common_verbs = verb_freq.most_common(k)
+
+    return (common_words, common_nouns, common_verbs)
 
 
 def write_freq_words_to_file(analysis_dir, local_file, common_terms):
@@ -117,7 +132,7 @@ def exec_transcript_analysis(transcript_dir, analysis_dir, transcript_filename):
     transcript_path = transcript_dir + transcript_filename
     transcript_doc, transcript_text = tokenize_and_clean_transcript(
         transcript_path, new_stopwords)
-    common_terms = analyze_transcript(transcript_doc, transcript_text, 10)
+    common_terms = get_freq_terms(transcript_doc, transcript_text, 10)
     write_freq_words_to_file(
         analysis_dir,
         transcript_filename.split('.')[0] + '_freq_words.txt', common_terms)
