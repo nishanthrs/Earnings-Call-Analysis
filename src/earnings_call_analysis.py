@@ -20,16 +20,18 @@ def add_stopwords(stopwords, new_stopwords):
 
 
 def tokenize_and_clean_transcript(local_file, new_stopwords):
-    '''
+    """
     Method that implements NLP pipeline of cleaning text:
     1. Tokenization
     2. Removing stopwords
     3. Lemmatization
 
-    Args: name of earnings call transcript file, new stop words
+    Args: 
+    local_file - name of earnings call transcript file
+    new_stopwords - new stop words to filter doc with
 
     Returns: list of tokens (spacy doc) and list of lemmatized words (list of strings)
-    '''
+    """
 
     punctuation = string.punctuation
     stopwords = spacy.lang.en.stop_words.STOP_WORDS
@@ -52,13 +54,16 @@ def tokenize_and_clean_transcript(local_file, new_stopwords):
 
 
 def analyze_transcript(transcript_doc, transcript_text, k):
-    '''
+    """
     Method that get k most frequent words of earnings call transcript
 
-    Args: spacy doc of transcript and text of transcript
+    Args: 
+    transcript_doc - spacy doc of transcript
+    transcript_text - text of transcript
+    k - k most common frequent terms
 
     Returns: list of k most frequent words
-    '''
+    """
 
     # five most common tokens
     word_freq = Counter(transcript_text)
@@ -73,6 +78,17 @@ def analyze_transcript(transcript_doc, transcript_text, k):
 
 
 def write_freq_words_to_file(analysis_dir, local_file, common_terms):
+    """
+    Method that writes the most frequent terms from the document to a file
+
+    Args:
+    analysis_dir - directory of frequent terms of earnings transcripts
+    local_file - name of file to write frequent terms to
+    common_terms - list of frequent terms
+
+    Returns: None
+    """
+
     if not os.path.exists(analysis_dir):
         os.makedirs(analysis_dir)
     freq_words_file_path = analysis_dir + '/' + local_file
@@ -87,6 +103,17 @@ def write_freq_words_to_file(analysis_dir, local_file, common_terms):
 
 
 def exec_transcript_analysis(transcript_dir, analysis_dir, transcript_filename):
+    """
+    Method that executes the entire transcript analysis to get most frequent words
+
+    Args: 
+    transcript_dir - directory of transcripts
+    analysis_dir - directory of transcript analysis files
+    transcript_filename - transcript filename
+
+    Returns: None
+    """
+
     transcript_path = transcript_dir + transcript_filename
     transcript_doc, transcript_text = tokenize_and_clean_transcript(
         transcript_path, new_stopwords)
