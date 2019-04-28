@@ -1,0 +1,45 @@
+1. Automate getting text of earning call given a specific company name/stock symbol through a web crawler/bot
+2. Develop NLP pipeline to clean text
+    1) Normalization (lowercase)
+    2) Clean text (remove stop words, punctuation, HTML)
+    3) Tokenization
+    4) Lemmatization
+3. Apply text analytics/information extraction/NLP algos:
+    1) TF-IDF
+    2) Common keywords frequency - separate by positive and negative sentiment
+    3) Sentiment analysis of words and documents
+    4) Named entity recognition/extraction
+    5) Text classification - perform tSNE or PCA on word embeddings, 
+                             then get unsupervised clustering of words or documents, regression, kNN, Naive Bayes
+    6) Upload to Elasticsearch cluster to build search index of earnings calls transcripts
+    7) Summarizations
+    8) Natural language question answering
+    Visually represent these ideas (plotly)
+4. Spot any trends/patterns by:
+    1) Comparing with previous earning reports of same company to see its direction
+    Ex. Mentions of 'trade wars' and 'government shutdowns' and other macroeconomic factors, mentions of specific technologies, more optimistic outlook with AI, etc.
+    2) Comparing with companies in same market/industry to see similarities and differences in strategy/priorities
+    Ex. Mentions of 'rewards', 'loyalty', 'promotions' increasing for banks, sentiment trend, document similarity, etc.
+    3) Who said what?
+    Ex. Does Nadella mention something more in specific compared to others, etc.
+5. Dockerize via Docker and deploy container as microservice
+6. Build separate Django app and deploy as web app
+
+Resources:
+http://stanford.edu/class/msande448/2017/Final/Reports/gr1.pdf
+
+Text Analytics Tasks:
+1. Frequent words / word distribution
+2. Trend of word distribution across earnings reports of same company/industry
+3. Word distribution / trend of word distribution of certain people
+4. TF-IDF techniques applied to stopword filtering, word distribution tasks
+
+NLP Tasks:
+1. Text classification
+2. Clustering of keywords
+3. Language models - text generation
+4. Summarizations
+5. Natural language question answering
+6. Text extraction (e.g. named entities)
+7. Sentiment analysis
+8. Chatbot integration
