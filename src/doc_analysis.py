@@ -1,16 +1,14 @@
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
-import nltk
+#!/usr/bin/env python3
+
 import spacy
 import string
 from collections import Counter
 import os
 
-# nltk.download('stopwords')
 nlp = spacy.load('en')
 # TODO: Continue to remove more stopwords (i.e. company name, 'quarter', 'year', '%', etc.)
-new_stopwords = ['thank', 'quarter', 'year', '’s',
-                 '%']  # People say 'thank you' way too much in earnings calls!
+# People say 'thank you' way too much in earnings calls!
+new_stopwords = ['thank', 'quarter', 'year', '’s', '%']
 
 
 def add_stopwords(stopwords, new_stopwords):
@@ -117,28 +115,31 @@ def write_freq_words_to_file(analysis_dir, local_file, common_terms):
     freq_words_file.close()
 
 
-def exec_transcript_analysis(transcript_dir, analysis_dir, transcript_filename):
+def exec_doc_analysis(docs_dir, analysis_dir):
     """
     Method that executes the entire transcript analysis to get most frequent words
 
     Args: 
-    transcript_dir - directory of transcripts
+    docs_dir - directory of transcripts
     analysis_dir - directory of transcript analysis files
     transcript_filename - transcript filename
 
     Returns: None
     """
 
-    transcript_path = transcript_dir + transcript_filename
-    transcript_doc, transcript_text = tokenize_and_clean_transcript(
-        transcript_path, new_stopwords)
-    common_terms = get_freq_terms(transcript_doc, transcript_text, 10)
-    write_freq_words_to_file(
-        analysis_dir,
-        transcript_filename.split('.')[0] + '_freq_words.txt', common_terms)
+    docs_filenames = [f for f in os.listdir(docs_dir) if os.path.isfile(os.path.join(docs_dir, f))]
+    for doc_filename in docs_filenames:
+        doc_path = os.path.join(docs_dir, doc_filename)
+        doc, doc_text = tokenize_and_clean_transcript(
+            doc_path, new_stopwords)
+        common_terms = get_freq_terms(doc, doc_text, 10)
+        write_freq_words_to_file(
+            analysis_dir,
+            '{}_freq_words.txt'.format(os.path.splitext(doc_filename)[0]),
+            common_terms
+        )
 
 
-transcript_dir = '../earnings_call_transcripts/tndm/'
+docs_dir = '../earnings_call_transcripts/tndm/'
 analysis_dir = '../nlp_analyis'
-transcript_filename = 'tndm_earnings_transcript_q3_2018.txt'
-exec_transcript_analysis(transcript_dir, analysis_dir, transcript_filename)
+exec_doc_analysis(docs_dir, analysis_dir)

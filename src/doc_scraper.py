@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import requests
 import html2text
 import random
@@ -30,6 +32,9 @@ def create_filename(transcript_uri):
     year = [q for q in transcript_metadata if re.match(r'\b(\d{4})\b', q)][0]
 
     transcript_filename = stock_symbol + '_earnings_transcript_' + date + '_' + year + '.txt'
+    transcript_filename = '{}_earnings_transcript_{}_{}.txt'.format(
+        stock_symbol, date, year
+    )
 
     return transcript_filename
 
@@ -53,7 +58,7 @@ def get_earnings_call_transcript(transcript_uri, transcript_filename):
             print("OOPS!! General Error")
             print(str(e))
         except KeyboardInterrupt:
-            print("Someone closed the program")
+            print("Program was closed")
             break
 
     transcript = open(transcript_filename, 'w+')
@@ -92,16 +97,24 @@ def clean_earnings_call_transcript_html(local_file, clean_file):
 
 def scrape_clean_transcript(transcript_uri):
     get_earnings_call_transcript(
-        transcript_uri, '../earnings_call_transcripts/transcript_html.txt')
+        transcript_uri, '../earnings_call_transcripts/transcript_html.txt'
+    )
 
     transcript_filename = create_filename(transcript_uri)
     clean_earnings_call_transcript_html(
-        '../earnings_call_transcripts/transcript_html.txt', transcript_filename)
+        '../earnings_call_transcripts/transcript_html.txt', transcript_filename
+    )
 
+def scrape_earnings_calls_transcripts(transcript_uri_file):
+    with open(transcript_uri_file, 'r') as transcript_file:
+        for link in transcript_file:
+            scrape_clean_transcript(link)
 
+'''
 scrape_clean_transcript(
     'https://seekingalpha.com/article/4244554-tandem-diabetes-care-inc-tndm-ceo-kim-blickenstaff-q4-2018-results-earnings-call-transcript?part=single'
 )
 scrape_clean_transcript(
     'https://seekingalpha.com/article/4217453-tandem-diabetes-care-inc-tndm-ceo-kim-blickenstaff-q3-2018-results-earnings-call-transcript'
 )
+'''
