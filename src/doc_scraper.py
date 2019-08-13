@@ -11,7 +11,7 @@ import os
 #   2. Free proxies: https://free-proxy-list.net]
 
 # Look into additional storage options: local filesystems, cloud filesystems, SQL or NoSQL databases
-# For now, since the files aren't too large, we'll use a 
+# For now, since the files aren't too large, we'll use a local filesystem
 # Requirements of storage option: store large number of small files, quick access/lookup time (read operation)
 '''
 
@@ -46,8 +46,9 @@ def get_earnings_call_transcript(transcript_uri, transcript_filename):
             rand_proxy = get_rand_ip_address()
             print("Proxy used: ", rand_proxy)
             r = requests.get(transcript_uri, proxies={'http': rand_proxy}).text
-            # TODO: add mechanism here to keep successful_req as False if robot page appears
-            successful_req = True
+            # Mechanism to keep successful_req as False if requests are successful but content access isn't
+            if not "Access to this page has been denied" in r:
+                successful_req = True
         except requests.ConnectionError as e:
             print("OOPS!! Connection Error. Technical Details given below.\n")
             print(str(e))
@@ -84,12 +85,17 @@ def clean_earnings_call_transcript_html(local_file, clean_file):
 
     a_1 = re.search(r'\b(Company Participants)\b', cleaned_earnings_transcript)
     a_2 = re.search(r'\b(Executives)\b', cleaned_earnings_transcript)
-    if a_1 == None:
-        a = a_2.start()
+    if a_1 == None and a_2 == None:
+        pass
     else:
-        a = a_1.start()
-    b = re.search(r'\b(Follow SA Transcripts and get email alerts)\b',
-                  cleaned_earnings_transcript).start()
+        if a_1 == None:
+            a = a_2.start()
+        else:
+            a = a_1.start()
+    b = re.search(
+        r'\b(Follow SA Transcripts and get email alerts)\b',
+        cleaned_earnings_transcript
+    ).start()
 
     transcript_clean.write(cleaned_earnings_transcript[(a - 2):b])
     transcript_clean.close()
@@ -108,7 +114,10 @@ def scrape_clean_transcript(transcript_uri):
 def scrape_earnings_calls_transcripts(transcript_uri_file):
     with open(transcript_uri_file, 'r') as transcript_file:
         for link in transcript_file:
-            scrape_clean_transcript(link)
+            if not link.strip().startswith('#'):
+                scrape_clean_transcript(link)
+
+scrape_earnings_calls_transcripts('../earning_call_transcript_links.txt')
 
 '''
 scrape_clean_transcript(
